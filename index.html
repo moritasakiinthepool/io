@@ -1,23 +1,60 @@
-export default {
-  async fetch() {
-    // GitHubのraw JSONを毎回取得（no-storeで確実に最新）
-    const res = await fetch("https://raw.githubusercontent.com/<username>/<repo>/main/config.json", {
-      cache: "no-store"
-    });
-    let target = "https://example.com";
-    try {
-      const { target: t } = await res.json();
-      if (typeof t === "string" && t) target = t;
-    } catch (_) {}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MoritaSaki in the pool</title>
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        "Location": target,
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
-        "Pragma": "no-cache",
-        "Expires": "0",
-      },
-    });
-  }
-}
+  <!-- 念のためHTMLもノーキャッシュ -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <style>
+    html,body{
+      height:100%;margin:0;background:#000;display:flex;align-items:center;justify-content:center
+    }
+    img{max-width:80vw;max-height:80vh;object-fit:contain}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  </style>
+</head>
+<body>
+  <!-- 画像一枚だけ表示 -->
+  <img src="./face.png" alt="loading" />
+  <span class="sr-only">Redirecting…</span>
+
+  <script>
+    // JSONから毎回“最新”を取る：クエリにタイムスタンプを付与
+    const url = `./config.json?ts=${Date.now()}`;
+
+    (async () => {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed');
+        const conf = await res.json();
+
+        // 1) そのままURL指定（もっとも簡単）
+        if (typeof conf.target === 'string' && conf.target) {
+          return location.replace(conf.target);
+        }
+
+        // 2) もし将来、時間や日付で切り替えたい場合の拡張（任意）
+        //    config.json に routes を用意しておくと便利
+        //    例: { "routes": [{ "from":"2025-10-09T00:00:00+09:00", "to":"2025-10-11T00:00:00+09:00", "url":"..." }] }
+        if (Array.isArray(conf.routes)) {
+          const now = new Date();
+          // JST基準で扱いたいなら Date をずらす or dayjs等を使う
+          for (const r of conf.routes) {
+            const from = r.from ? new Date(r.from) : new Date('1970-01-01');
+            const to   = r.to   ? new Date(r.to)   : new Date('2999-12-31');
+            if (now >= from && now < to && typeof r.url === 'string') {
+              return location.replace(r.url);
+            }
+          }
+        }
+
+        // 3) 何も見つからない時の最終フォールバック
+        location.replace("https://example.com");
+      } catch (e) {
+        // JSON取得に失敗した場合の保険
+        location.replace("https://example
