@@ -31,7 +31,7 @@
         throw new Error('invalid target');
       } catch (e) {
         // 失敗時の保険（任意のデフォルトURL）
-        const fallback = "https://example.com/your-latest-page";
+        const fallback = "https://open.spotify.com/intl-ja/artist/0cascybzS2QQL1m3h57tcY?si=L3E0cQqrRGevvujvSNcmPw";
         document.getElementById('fallback').href = fallback;
         document.getElementById('fallback').textContent = fallback;
         location.replace(fallback);
