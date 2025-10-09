@@ -1,13 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
-  <meta charset="utf-8">
+<head>
+  <meta charset="UTF-8" />
   <title>Redirecting…</title>
-  aa
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>/* 省略：上と同じ */</style>
+</head>
+<body>
+  <div class="wrap"><div class="box">
+    <h1>Redirecting…</h1>
+    <p>移動します、自動で切り替わらない場合は下のリンクをタップ。</p>
+    <p><a id="fallback" href="#">Loading…</a></p>
+  </div></div>
   <script>
-    // 行き先URLをここに設定
-    
+    async function go() {
+      try {
+        // 常に最新を取るためno-cache指定
+        const res = await fetch('config.json', { cache: 'no-store' });
+        const conf = await res.json();
+        const target = conf && conf.target;
+        if (typeof target === 'string' && target) {
+          document.getElementById('fallback').href = target;
+          document.getElementById('fallback').textContent = target;
+          location.replace(target);
+          return;
+        }
+        throw new Error('invalid target');
+      } catch (e) {
+        // 失敗時の保険（任意のデフォルトURL）
+        const fallback = "https://example.com/your-latest-page";
+        document.getElementById('fallback').href = fallback;
+        document.getElementById('fallback').textContent = fallback;
+        location.replace(fallback);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', go);
   </script>
-  <noscript>
-    <meta http-equiv="refresh" content="0; url=https://example.com/">
-  </noscript>
+</body>
 </html>
