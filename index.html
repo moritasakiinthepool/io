@@ -1,41 +1,23 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MoritaSaki in the pool</title>
+export default {
+  async fetch() {
+    // GitHubのraw JSONを毎回取得（no-storeで確実に最新）
+    const res = await fetch("https://raw.githubusercontent.com/<username>/<repo>/main/config.json", {
+      cache: "no-store"
+    });
+    let target = "https://example.com";
+    try {
+      const { target: t } = await res.json();
+      if (typeof t === "string" && t) target = t;
+    } catch (_) {}
 
-  <!-- キャッシュ無効 -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
-  <style>
-    html,body {
-      height:100%;
-      margin:0;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    img {
-      max-width:80vw;
-      max-height:80vh;
-      object-fit:contain;
-    }
-  </style>
-</head>
-<body>
-  <!-- 表示したい画像をここに -->
-  <img src="https://moritasakiinthepool.github.io/io/face.png" alt="loading" />
-
-  <script>
-    const TARGET_URL = "https://www.youtube.com/watch?v=nnHp84WGado";
-    // 表示後に1秒だけ見せてから自動遷移（調整可）
-    setTimeout(() => {
-      location.replace(TARGET_URL);
-    }, 1000);
-  </script>
-</body>
-</html>
+    return new Response(null, {
+      status: 302,
+      headers: {
+        "Location": target,
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+    });
+  }
+}
