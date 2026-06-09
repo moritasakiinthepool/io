@@ -37,23 +37,12 @@ function getEventState() {
 }
 
 function showCountdown(daysLeft) {
-  const canvas = document.querySelector("#c");
-  const context = canvas.getContext("2d");
-  const message = `大阪ワンマンまであと${daysLeft}日`;
-
   document.body.classList.add("countdown-mode");
-  context.imageSmoothingEnabled = false;
-  context.fillStyle = "#000";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#fff";
-  context.font = "10px PixelMplus10, monospace";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(
-    message,
-    Math.round(canvas.width / 2),
-    Math.round(canvas.height / 2),
-  );
+
+  const message = document.createElement("p");
+  message.className = "countdown-message";
+  message.textContent = `大阪ワンマンまであと${daysLeft}日`;
+  document.body.append(message);
 }
 
 const state = getEventState();
