@@ -105,7 +105,7 @@ function update(now, deltaMs) {
   if (!messageStarted) {
     messageStarted = true;
     dialog.open("よ！オマエ！", () => {
-      dialog.open("今日は大阪ワンマンの日だ！", () => {
+      dialog.open("今日は東京ワンマンの日だ！", () => {
         setTimeout(() => {
           choice.open("遊びに来るのか？", (index) => {
             if (index === 0) {

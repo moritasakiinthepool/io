@@ -1,5 +1,5 @@
 const EVENT_MONTH = 6;
-const EVENT_DAY = 14;
+const EVENT_DAY = 27;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function getJstDateParts(date = new Date()) {
@@ -41,13 +41,13 @@ function showCountdown(daysLeft) {
 
   const message = document.createElement("p");
   message.className = "countdown-message";
-  message.textContent = `大阪ワンマンまであと${daysLeft}日`;
+  message.textContent = `東京ワンマンまであと${daysLeft}日`;
   document.body.append(message);
 }
 
 const state = getEventState();
 if (state.isEventDay) {
-  import("./main.js?v=20260609-3");
+  import("./main.js?v=20260615-2");
 } else {
   showCountdown(state.daysLeft);
 }
