@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0c1c24" />
+  <title>POOL DESIGNER</title>
+  <meta name="description" content="屋内プールの響きを物理シミュレーションで設計して、曲にかけて聴けるブラウザアプリ" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <h1>POOL DESIGNER</h1>
+        <p>屋内プールの響きを設計する</p>
+      </div>
+      <div class="top-controls">
+        <button id="detailToggle" class="pill" type="button" aria-pressed="false">詳細設定</button>
+        <label class="preset">
+          <span>PRESET</span>
+          <select id="preset"></select>
+        </label>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel room">
+        <div class="panel-head">
+          <span class="label">ROOM</span>
+          <span id="dims" class="muted"></span>
+        </div>
+        <canvas id="scene" aria-label="部屋の立体図。L・W・H と音源・聴く位置をドラッグできます"></canvas>
+        <p class="hint">L・W・H と 音源・聴く位置 をドラッグ</p>
+
+        <div id="surfaceBlock" class="detail-only">
+          <div class="label">面 / SURFACE</div>
+          <div id="surfaceTabs" class="scroll-row tabs"></div>
+        </div>
+        <div class="material-head">
+          <span id="materialLabel" class="label">素材 / MATERIAL ― すべての面</span>
+          <span id="customNote" class="note" hidden>面ごとに設定中(詳細設定で確認)</span>
+        </div>
+        <div id="materials" class="chips"></div>
+        <div class="mix-row detail-only">
+          <span class="label">混ぜる素材</span>
+          <select id="materialB"></select>
+          <span class="label">割合</span>
+          <input id="mixB" type="range" min="0" max="1" step="0.01" />
+          <span id="mixBValue" class="value-sm"></span>
+        </div>
+      </section>
+
+      <section class="panel side">
+        <div id="player" class="player">
+          <button id="play" class="play" type="button" aria-label="再生">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path id="playIcon" d="M8 5v14l11-7z" /></svg>
+          </button>
+          <div class="track">
+            <div class="track-title"><span id="trackTitle">She died under the bridge</span><span class="muted" id="trackArtist">MoritaSaki in the pool</span></div>
+            <div class="seek-row">
+              <input id="seek" type="range" min="0" max="1000" value="0" aria-label="再生位置" />
+              <span id="time" class="time">0:00</span>
+            </div>
+          </div>
+          <button id="bypass" class="fx on" type="button" aria-pressed="true" title="エフェクトのオン/オフで原音と聴き比べ">FX ON</button>
+        </div>
+        <div id="sliders" class="sliders"></div>
+        <label class="own-file">
+          <input id="file" type="file" accept="audio/*" />
+          <span>自分の音源で試す</span>
+          <small>ファイルは端末の中だけで再生され、送信されません</small>
+        </label>
+      </section>
+
+      <section class="panel stats">
+        <div class="chart-wrap">
+          <div class="chart-head"><span class="label">残響時間 RT60</span><span class="legend"><i class="sw sim"></i>シミュレーション <i class="sw ey"></i>Eyring 式</span></div>
+          <div id="chart" class="chart"></div>
+        </div>
+        <div class="figures">
+          <div><span class="label">響きの長さ(中音域)</span><b id="rtMid">–</b></div>
+          <div><span class="label">臨界距離</span><b id="critical">–</b></div>
+          <div><span class="label">音源までの距離</span><b id="distance">–</b></div>
+          <div><span class="label">状態</span><b id="status">準備中…</b></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>寸法・素材・位置の変更は、再計算後になめらかに音へ反映されます。ヘッドホン推奨。</span>
+      <span>Music: MoritaSaki in the pool</span>
+    </footer>
+  </div>
+
+  <audio id="audio" src="./assets/she-died-under-the-bridge.mp3" preload="metadata" playsinline></audio>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
