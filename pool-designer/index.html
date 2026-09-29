@@ -7,6 +7,12 @@
   <title>POOL DESIGNER</title>
   <meta name="description" content="屋内プールの響きを物理シミュレーションで設計して、曲にかけて聴けるブラウザアプリ" />
   <link rel="stylesheet" href="./style.css" />
+  <!-- モジュールを最初からまとめて読み込み、import の待ちを減らす -->
+  <link rel="modulepreload" href="./src/main.js" />
+  <link rel="modulepreload" href="./src/room-model.js" />
+  <link rel="modulepreload" href="./src/params.js" />
+  <link rel="modulepreload" href="./src/scene.js" />
+  <link rel="modulepreload" href="./src/engine.js" />
 </head>
 <body>
   <div class="app">
