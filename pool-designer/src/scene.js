@@ -72,8 +72,9 @@ export class RoomScene {
     return fit({ x: p.x - 40 * k, y: Math.min(p.y - 9, W.y - 40 * k) });
   }
 
-  dotPos(pr, which) {
-    const s = this.getSpec(), z = Math.min(EAR_HEIGHT, pr.h - 0.1);
+  // 掴む点は床の上。耳の高さは描画でだけ示す
+  dotPos(pr, which, z = 0) {
+    const s = this.getSpec();
     return which === 'source' ? pr.point(s.sourceX * pr.l, s.sourceY * pr.w, z) : pr.point(s.listenerX * pr.l, s.listenerY * pr.w, z);
   }
 
@@ -190,9 +191,15 @@ export class RoomScene {
 
     // 音源・聴く位置と水面での1次反射(音声処理と同じ幾何)
     const sx = s.sourceX * L, sy = s.sourceY * W, lx = s.listenerX * L, ly = s.listenerY * W;
-    const src = this.dotPos(pr, 'source'), lst = this.dotPos(pr, 'listener');
-    line(src, P(sx, sy), 'rgba(244,209,140,0.35)', 1);
-    line(lst, P(lx, ly), 'rgba(107,219,200,0.35)', 1);
+    const ear = Math.min(EAR_HEIGHT, H - 0.1);
+    const srcFloor = this.dotPos(pr, 'source'), lstFloor = this.dotPos(pr, 'listener');
+    const src = this.dotPos(pr, 'source', ear), lst = this.dotPos(pr, 'listener', ear);
+    line(srcFloor, src, 'rgba(244,209,140,0.55)', 1.2);
+    line(lstFloor, lst, 'rgba(107,219,200,0.55)', 1.2);
+    for (const [p, c] of [[src, GOLD], [lst, AQUA]]) {
+      g.fillStyle = c;
+      g.beginPath(); g.arc(p.x, p.y, 2.5, 0, Math.PI * 2); g.fill();
+    }
     line(src, lst, 'rgba(255,255,255,0.18)', 1, true);
     const rx = (sx + lx) / 2, ry = (sy + ly) / 2;
     if (rx >= deck && rx <= L - deck && ry >= deck && ry <= W - deck) {
@@ -211,8 +218,8 @@ export class RoomScene {
       g.fillStyle = INK; g.font = '600 10px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top';
       g.fillText(label, p.x, p.y + 10);
     };
-    dot(src, GOLD, '音源', this.drag === 'source' || this.hover === 'source');
-    dot(lst, AQUA, '聴く位置', this.drag === 'listener' || this.hover === 'listener');
+    dot(srcFloor, GOLD, '音源', this.drag === 'source' || this.hover === 'source');
+    dot(lstFloor, AQUA, '聴く位置', this.drag === 'listener' || this.hover === 'listener');
 
     // 寸法ラベル
     const k = this.compact ? 0.78 : 1;
@@ -281,7 +288,7 @@ export class RoomScene {
       const lim = { length: [5, 100], width: [4, 60], height: [2.5, 30] }[key];
       this.onChange({ [key]: Math.min(lim[1], Math.max(lim[0], Math.round((this.dragStart + delta) * 2) / 2)) });
     } else {
-      const q = pr.unproject(p, Math.min(EAR_HEIGHT, pr.h - 0.1));
+      const q = pr.unproject(p, 0);
       const clamp01 = (v) => Math.min(1, Math.max(0, Math.round(v * 100) / 100));
       const isSource = this.drag === 'source';
       this.onChange({ [isSource ? 'sourceX' : 'listenerX']: clamp01(q.x / pr.l), [isSource ? 'sourceY' : 'listenerY']: clamp01(q.y / pr.w) });
